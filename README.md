@@ -1,6 +1,6 @@
 # vue-seller
 
-> a vue project
+> a vue project by learn
 
 ## Build Setup
 
