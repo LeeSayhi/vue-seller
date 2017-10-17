@@ -32,15 +32,32 @@
       </div>
       <transition name="fade">
         <div v-show="detailShow" class="detail" @click="detailClose">
-        <div class="detail-wrapper">
-          <div class="detail-main">
-            <h1 class="title">{{seller.name}}</h1>
-            <div class="star-wreapper">
-              <v-star :size="48" :score="seller.score"></v-star>
+          <div class="detail-wrapper clearfix" ref="detail">
+            <div class="detail-main">
+              <h1 class="name">{{seller.name}}</h1>
+              <div class="star-wreapper">
+                <v-star :size="48" :score="seller.score"></v-star>
+              </div>
+              <div class="title">
+                <v-line :text="dis"></v-line>
+              </div>       
+              <ul v-if="seller.supports" class="supports">
+                <li class="support-item" v-for="(item, index) in seller.supports">
+                  <span class="icon" :class="classMap[seller.supports[index].type]"></span>
+                  <span class="text">{{seller.supports[index].description}}</span>
+                </li>
+              </ul>
+              <div class="title">
+                <v-line :text="adv"></v-line>
+              </div>
+              <div class="bulletin">
+                <p class="content">{{seller.bulletin}}</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="detail-close"></div>
+          <div class="detail-close">
+            <i class="icon-close"></i>
+          </div>
         </div>
       </transition>
 		</div>
@@ -48,7 +65,10 @@
 </template>
 
 <script>
+  import BScroll from 'better-scroll'
+
   import star from '../star/star.vue'
+  import line from '../line/line.vue'
 
   export default {
     props: {
@@ -58,7 +78,9 @@
     },
     data () {
       return {
-        detailShow: false
+        detailShow: false,
+        dis: '优惠信息',
+        adv: '商家公告'
       }
     },
     created () {
@@ -73,7 +95,15 @@
       }
     },
     components: {
-      'v-star': star
+      'v-star': star,
+      'v-line': line
+    },
+    mounted: function () {
+      this.$nextTick(() => {
+        /* eslint-disable no-new */
+        new BScroll(this.$refs.detail, {
+        })
+      })
     }
   }
 </script>
@@ -208,4 +238,68 @@
       &.fade-enter, &.fade-leave-to
         opacity: 0
         background: rgba(7, 17, 27, 0)
+      .detail-wrapper
+        width: 100%
+        .detail-main
+          margin-top: 64px
+          padding-bottom: 64px
+          .name
+            line-height: 16px
+            text-align: center
+            font-size: 16px
+            font-weight: 700
+            color: rgb(255, 255, 255)
+          .star-wreapper
+            margin-top: 18px
+            padding 2px 0
+            text-align: center
+          .title
+            width: 80%
+            margin: 28px auto 24px auto
+          .supports
+            width: 80%
+            margin: 0 auto
+            .support-item
+              padding: 0 12px
+              margin-bottom: 12px
+              font-size: 0
+              &:last-child
+                margin-bottom: 0
+              .icon
+                display: inline-block
+                width: 16px
+                height: 16px
+                vertical-align: top
+                margin-right: 6px
+                background-size: 16px 16px
+                &.decrease
+                  bg-image('decrease_2')
+                &.discount
+                  bg-image('discount_2')
+                &.guarantee
+                  bg-image('guarantee_2')
+                &.invoice
+                  bg-image('invoice_2')
+                &.special
+                  bg-image('special_2')
+              .text
+                font-size: 12px
+                line-height: 16px
+          .bulletin
+            width: 80%
+            margin: 0 auto
+            .content
+              line-height: 28px
+              font-size: 12px
+              font-weight: 200
+              color: rgb(255, 255, 255)
+      .detail-close
+        position: relative
+        width: 32px
+        height: 32px
+        margin: -64px auto 0 auto
+        clear: both
+        font-size: 32px
+            
+      
 </style>
