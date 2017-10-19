@@ -1,71 +1,69 @@
 <template>
-	<div>
-		<div class="header">
-			<div class="content-wrapper">
-				<div class="avatar">
-					<img :src="seller.avatar" width="64" height="64">
+	<div class="header">
+		<div class="content-wrapper">
+			<div class="avatar">
+				<img :src="seller.avatar" width="64" height="64">
+			</div>
+			<div class="content">
+				<div class="title">
+					<span class="brand"></span>
+					<span class="name">{{seller.name}}</span>
 				</div>
-				<div class="content">
-					<div class="title">
-						<span class="brand"></span>
-						<span class="name">{{seller.name}}</span>
-					</div>
-					<div class="description">
-						{{seller.description}}/{{seller.deliveryTime}}分钟送达
-					</div>
-					<div v-if="seller.supports" class="support">
-						<span class="icon" :class="classMap[seller.supports[0].type]"></span>
-						<span class="text">{{seller.supports[0].description}}</span>
-					</div>
+				<div class="description">
+					{{seller.description}}/{{seller.deliveryTime}}分钟送达
 				</div>
-				<div v-if="seller.supports" class="support-count" @click="showDetail">
-					<span class="count">{{seller.supports.length}}个</span>
-					<i class="icon-keyboard_arrow_right"></i>
+				<div v-if="seller.supports" class="support">
+					<span class="icon" :class="classMap[seller.supports[0].type]"></span>
+					<span class="text">{{seller.supports[0].description}}</span>
 				</div>
 			</div>
-      <div class="bulletin-wrapper" @click="showDetail">
-        <span class="bulletin-title"></span><span class="bulletin-text">{{seller.bulletin}}</span>
-        <i class="icon-keyboard_arrow_right"></i>
-      </div>
-      <div class="background">
-        <img :src="seller.avatar" width="100%" height="100%">
-      </div>
-      <transition name="fade">
-        <div v-show="detailShow" class="detail" @click="detailClose">
-          <div class="detail-wrapper clearfix" ref="detail">
-            <div class="detail-main">
-              <h1 class="name">{{seller.name}}</h1>
-              <div class="star-wreapper">
-                <v-star :size="48" :score="seller.score"></v-star>
-              </div>
-              <div class="title">
-                <v-line :text="dis"></v-line>
-              </div>       
-              <ul v-if="seller.supports" class="supports">
-                <li class="support-item" v-for="(item, index) in seller.supports">
-                  <span class="icon" :class="classMap[seller.supports[index].type]"></span>
-                  <span class="text">{{seller.supports[index].description}}</span>
-                </li>
-              </ul>
-              <div class="title">
-                <v-line :text="adv"></v-line>
-              </div>
-              <div class="bulletin">
-                <p class="content">{{seller.bulletin}}</p>
-              </div>
+			<div v-if="seller.supports" class="support-count" @click="showDetail">
+				<span class="count">{{seller.supports.length}}个</span>
+				<i class="icon-keyboard_arrow_right"></i>
+			</div>
+		</div>
+    <div class="bulletin-wrapper" @click="showDetail">
+      <span class="bulletin-title"></span><span class="bulletin-text">{{seller.bulletin}}</span>
+      <i class="icon-keyboard_arrow_right"></i>
+    </div>
+    <div class="background">
+      <img :src="seller.avatar" width="100%" height="100%">
+    </div>
+    <transition name="fade">
+      <div v-show="detailShow" class="detail" @click="detailClose">
+        <div class="detail-wrapper clearfix" ref="detail">
+          <div class="detail-main">
+            <h1 class="name">{{seller.name}}</h1>
+            <div class="star-wreapper">
+              <v-star :size="48" :score="seller.score"></v-star>
+            </div>
+            <div class="title">
+              <v-line :text="dis"></v-line>
+            </div>       
+            <ul v-if="seller.supports" class="supports">
+              <li class="support-item" v-for="(item, index) in seller.supports">
+                <span class="icon" :class="classMap[seller.supports[index].type]"></span>
+                <span class="text">{{seller.supports[index].description}}</span>
+              </li>
+            </ul>
+            <div class="title">
+              <v-line :text="adv"></v-line>
+            </div>
+            <div class="bulletin">
+              <p class="content">{{seller.bulletin}}</p>
             </div>
           </div>
-          <div class="detail-close">
-            <i class="icon-close"></i>
-          </div>
         </div>
-      </transition>
-		</div>
+        <div class="detail-close">
+          <i class="icon-close"></i>
+        </div>
+      </div>
+    </transition>
 	</div>
 </template>
 
 <script>
-  import BScroll from 'better-scroll'
+  // import BScroll from 'better-scroll'
 
   import star from '../star/star.vue'
   import line from '../line/line.vue'
@@ -97,13 +95,6 @@
     components: {
       'v-star': star,
       'v-line': line
-    },
-    mounted: function () {
-      this.$nextTick(() => {
-        /* eslint-disable no-new */
-        new BScroll(this.$refs.detail, {
-        })
-      })
     }
   }
 </script>
@@ -232,6 +223,7 @@
       transition: all 0.5s
       backdrop-filter: blur(10px)
       background: rgba(7, 17, 27, 0.8)
+      z-index: 99
       &.fade-enter-active, .fade-leave-active
         opacity: 1
         background: rgba(7, 17, 27, 0.8)
