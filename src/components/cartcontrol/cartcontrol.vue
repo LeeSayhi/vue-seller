@@ -11,6 +11,7 @@
 </template>
 <script>
   import Vue from 'vue'
+
   export default {
     props: {
       food: {
@@ -27,6 +28,7 @@
         } else {
           this.food.count++
         }
+        this.$emit('cartDrop', event.target)
       },
       decreaseCart (event) {
         if (!event._constructed) {

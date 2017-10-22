@@ -43,7 +43,6 @@ apiRoutes.get('/goods', function (req, res) {
     data: goods
   });
 });
-
 apiRoutes.get('/ratings', function (req, res) {
   res.json({
     errno: 0,
