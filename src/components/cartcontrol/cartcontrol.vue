@@ -24,10 +24,12 @@
           return
         }
         if (!this.food.count) {
+          // this.food并没有count属性，用Vue.set()设置并赋值
           Vue.set(this.food, 'count', 1)
         } else {
           this.food.count++
         }
+        // 触发cartDrop事件给父组件，将当前DOM对象传递过去
         this.$emit('cartDrop', event.target)
       },
       decreaseCart (event) {

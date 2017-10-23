@@ -62,6 +62,7 @@
     created () {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee']
 
+      // 获取goods数据
       this.$http.get('/api/goods').then((response) => {
         if (response.data.errno === 0) {
           this.goods = response.data.data
@@ -73,6 +74,7 @@
       })
     },
     computed: {
+      // 滚动的位置(this.scrollY)在两个列表之间，返回第一个索引
       currentIndex () {
         for (let i = 0; i < this.listHeight.length; i++) {
           let height1 = this.listHeight[i]
@@ -83,6 +85,7 @@
         }
         return 0
       },
+      // 判断是否有food.count属性（cartcontrol组件内Vue.set的）拿到选择的商品
       selectFoods () {
         let foods = []
         this.goods.forEach((good) => {
@@ -96,6 +99,7 @@
       }
     },
     methods: {
+      // 初始化滚动
       _initScroll () {
         this.menuScroll = new BScroll(this.$refs.menuWrapper, {
           click: true
@@ -108,6 +112,7 @@
           this.scrollY = Math.abs(Math.round(pos.y))
         })
       },
+      // 计算右侧每个商品列表的高度
       _calculateHeight () {
         let foodList = this.$refs.goodsWrapper.getElementsByClassName('food-list-hook')
         let height = 0
@@ -118,6 +123,7 @@
           this.listHeight.push(height)
         }
       },
+      // 点击左侧选择列表右侧联动
       selectMenu (index, event) {
         if (!event._constructed) {
           return

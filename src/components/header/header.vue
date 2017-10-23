@@ -222,7 +222,7 @@
       overflow: auto
       backdrop-filter: blur(10px)
       background: rgba(7, 17, 27, 0.8)
-      opactiy: 1
+      opacity: 1
       z-index: 99
       &.fade-enter-active, &.fade-leave-active
         transition: all 0.5s
