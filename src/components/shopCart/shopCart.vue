@@ -1,7 +1,7 @@
 <template>
   <div class="shopCart-wrapper">
-    <div class="shopCart" @click="toggleList">
-      <div class="content">
+    <div class="shopCart">
+      <div class="content" @click="toggleList">
       	<div class="content-left">
       	  <div class="logo-wrapper">
       	  	<div class="logo" :class="{'highlight': totalCount>0}">
@@ -12,7 +12,7 @@
       	  <div class="price" :class="{'highlight': totalPrice>0}">&yen;&nbsp;{{totalPrice}}</div>
       	  <div class="desc">另需配送费 &yen; {{deliveryPrice}}元</div>
       	</div>
-      	<div class="content-right">
+      	<div class="content-right" @click.stop.prevent="pay">
           <div class="pay not-enough" :class="payClass">{{payDesc}}</div> 
         </div>
       </div>
@@ -29,9 +29,9 @@
         <div class="shopCart-list" v-show="listShow">
           <div class="list-header">
             <div class="title">购物车</div>
-            <div class="empty">清空</div>
+            <div class="empty" @click="emptyFoods">清空</div>
           </div>
-          <div class="list-content">
+          <div class="list-content" ref="listContent">
             <ul>
               <li v-for="food in selectFoods" class="food">
                   <span class="name">{{food.name}}</span>
@@ -47,8 +47,8 @@
         </div>
       </transition>
     </div>
-    <transition name="fade" v-show="listShow" ref="listContent">
-      <div class="list-mask" v-show="listShow"></div>
+    <transition name="fade" v-show="listShow">
+      <div class="list-mask" v-show="listShow" @click="hideList"></div>
     </transition>
   </div>
 </template>
@@ -91,8 +91,8 @@
             show: false
           }
         ],
-        dropBalls: [],
-        fold: true
+        dropBalls: [],  // 需要过渡的小球数组
+        fold: true  // 折叠状态
       }
     },
     computed: {
@@ -135,11 +135,12 @@
         let show = !this.fold
         if (show) {
           this.$nextTick(() => {
-            if (!this.scroll) {
+            if (!this.scroll) { // 因为是切换状态，如果没有this.scroll 去new BScroll
               this.scroll = new BScroll(this.$refs.listContent, {
                 click: true
               })
             } else {
+              // 如果有个重新计算高度
               this.scroll.refresh()
             }
           })
@@ -148,7 +149,7 @@
       }
     },
     methods: {
-      // cartcontrol组件点击添加商品后父组件(goods)监听，并调用这个事件
+      // cartcontrol组件点击添加商品(传入当前DOM对象)后父组件(goods)监听，并调用这个事件
       // el: cartcontrol组件点击的当前DOM对象
       drop (el) {
         for (let i = 0; i < this.balls.length; i++) {
@@ -205,6 +206,20 @@
           return
         }
         this.fold = !this.fold
+      },
+      emptyFoods () {
+        this.selectFoods.forEach((food) => {
+          food.count = 0
+        })
+      },
+      hideList () {
+        this.fold = true
+      },
+      pay () {
+        if (this.totalPrice < this.minPrice) {
+          return
+        }
+        window.alert(`去支付${this.totalPrice}元`)
       }
     },
     components: {
