@@ -17,6 +17,7 @@
         </div>
       </div>
     </div>
+    <div class="ball-container"></div>
   </div>
 </template>
 <script>
