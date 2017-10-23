@@ -28,7 +28,7 @@
                   <span class="now">&yen;{{food.price}}</span><span class="old" v-show="food.oldPrice">{{food.oldPrice}}</span>
                 </div>
                 <div class="cartcontrol-wrapper">
-                  <v-cartcontrol :food="food"></v-cartcontrol>
+                  <v-cartcontrol :food="food" @cartDrop="_drop"></v-cartcontrol>
                 </div>
               </div>
             </li>
@@ -36,7 +36,7 @@
         </li>
       </ul> 
     </div>
-    <v-shopCart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopCart>
+    <v-shopCart ref="shopCart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopCart>
   </div>
 </template>
 
@@ -64,7 +64,7 @@
 
       this.$http.get('/api/goods').then((response) => {
         if (response.data.errno === 0) {
-          this.goods = Object.assign({}, this.goods, response.data.data)
+          this.goods = response.data.data
           this.$nextTick(() => {
             this._initScroll()
             this._calculateHeight()
@@ -82,6 +82,17 @@
           }
         }
         return 0
+      },
+      selectFoods () {
+        let foods = []
+        this.goods.forEach((good) => {
+          good.foods.forEach((food) => {
+            if (food.count) {
+              foods.push(food)
+            }
+          })
+        })
+        return foods
       }
     },
     methods: {
@@ -114,6 +125,14 @@
         let foodList = this.$refs.goodsWrapper.getElementsByClassName('food-list-hook')
         let el = foodList[index]
         this.goodsScroll.scrollToElement(el, 300)
+      },
+      // 监听cartcontrol(子组件)触发的事件(_drop),
+      // 然后调用shopCart(另一个子组件)的drop(方法)
+      // 目的是让shopCart组件内拿到cartcontrol组件内点击的DOM元素
+      _drop (event) {
+        this.$nextTick(() => {
+          this.$refs.shopCart.drop(event)
+        })
       }
     },
     components: {
@@ -121,6 +140,7 @@
       'v-cartcontrol': cartcontrol
     }
   }
+
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
