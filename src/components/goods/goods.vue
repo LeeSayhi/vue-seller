@@ -14,7 +14,7 @@
         <li v-for="item in goods" class="food-list food-list-hook">
           <h1 class="title">{{item.name}}</h1>
           <ul>
-            <li v-for="food in item.foods" class="food-item">
+            <li v-for="food in item.foods" class="food-item" @click="selectFoodItem(food, $event)">
               <div class="icon">
                 <img :src="food.icon" width="57" height="57">
               </div>
@@ -37,6 +37,7 @@
       </ul> 
     </div>
     <v-shopCart ref="shopCart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopCart>
+    <v-food :food="selectFood" ref="food"></v-food>
   </div>
 </template>
 
@@ -45,13 +46,15 @@
 
   import shopCart from '../shopCart/shopCart.vue'
   import cartcontrol from '../cartcontrol/cartcontrol.vue'
+  import food from '../food/food.vue'
 
   export default {
     data () {
       return {
         goods: {},
         listHeight: [],
-        scrollY: 0
+        scrollY: 0,
+        selectFood: {}
       }
     },
     props: {
@@ -132,6 +135,14 @@
         let el = foodList[index]
         this.goodsScroll.scrollToElement(el, 300)
       },
+      // 查看商品详情
+      selectFoodItem (food, event) {
+        if (!event._constructed) {
+          return
+        }
+        this.selectFood = food
+        this.$refs.food.show()
+      },
       // 监听cartcontrol(子组件)触发的事件(_drop),
       // 然后调用shopCart(另一个子组件)的drop(方法)
       // 目的是让shopCart组件内拿到cartcontrol组件内点击的DOM元素
@@ -143,7 +154,8 @@
     },
     components: {
       'v-shopCart': shopCart,
-      'v-cartcontrol': cartcontrol
+      'v-cartcontrol': cartcontrol,
+      'v-food': food
     }
   }
 
