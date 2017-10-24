@@ -35,7 +35,7 @@
   import cartcontrol from '../cartcontrol/cartcontrol.vue'
   import split from '../split/split.vue'
 
-  import BScroll from 'better-scroll'
+  // import BScroll from 'better-scroll'
 
   export default {
     props: {
