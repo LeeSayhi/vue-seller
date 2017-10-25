@@ -1,5 +1,5 @@
 <template>
-  <div class="food" v-show="showFlag">
+  <div class="food" v-show="showFlag" ref="food">
     <div class="food-content">
       <div class="image-header">
         <img :src="food.image">
@@ -21,21 +21,39 @@
         </div>
         <div class="buy">加入购物车</div>
       </div>
+      <v-split v-show="food.info"></v-split>
+      <div class="info" v-show="food.info">
+        <h1 class="title">商品介绍</h1>
+        <p class="text">{{food.info}}</p>
+      </div>
+      <v-split></v-split>
+      <div class="rating">
+        <h1 class="title">商品评价</h1>
+        <v-ratingSelect :desc="desc" :select-type="selectType" :ratings="food.ratings"></v-ratingSelect>
+        <div class="rating-wrapper">
+          <ul>
+            <li v-for="rating in food.ratings">
+              <div class="time"></div>
+              <p class="text">{{rating.text}}</p>
+              <div class="user">
+                <span class="name">{{rating.username}}</span>
+                <img :src="rating.avatar">
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>                
     </div>
-    <v-split v-show="food.info"></v-split>
-    <div class="info" v-show="food.info">
-      <h1 class="title">商品介绍</h1>
-      <p class="text">{{food.info}}</p>
-    </div>
-    <v-split></v-split>
-    <div class="rating"></div>
   </div>
 </template>
 <script>
   import cartcontrol from '../cartcontrol/cartcontrol.vue'
   import split from '../split/split.vue'
+  import ratingSelect from '../ratingSelect/ratingSelect.vue'
 
-  // import BScroll from 'better-scroll'
+  import BScroll from 'better-scroll'
+
+  const ALL = 0
 
   export default {
     props: {
@@ -45,12 +63,23 @@
     },
     data () {
       return {
-        showFlag: false
+        showFlag: false,
+        selectType: ALL,
+        desc: {
+          all: '全部',
+          positive: '推荐',
+          negative: '吐槽'
+        }
       }
     },
     methods: {
       show () {
         this.showFlag = true
+        this.$nextTick(() => {
+          this.scroll = new BScroll(this.$refs.food, {
+            click: true
+          })
+        })
       },
       hide () {
         this.showFlag = false
@@ -58,7 +87,8 @@
     },
     components: {
       'v-cartcontrol': cartcontrol,
-      'v-split': split
+      'v-split': split,
+      'v-ratingSelect': ratingSelect
     }
   }
 </script>
@@ -151,4 +181,11 @@
         padding: 0 8px
         font-size: 12px
         color: rgb(77, 85, 93)
+    .rating
+      padding-top: 18px
+      .title
+        line-height: 14px
+        margin-left: 18px
+        font-size: 14px
+        color: rgb(7, 17, 27)  
 </style>
