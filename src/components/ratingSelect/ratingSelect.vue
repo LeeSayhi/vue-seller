@@ -1,9 +1,9 @@
 <template>
   <div class="ratingSelect">
     <div class="rating-type border-1px">
-      <span @click="select(0)" class="block positive" :class="{'active' :selectType===0}">{{desc.all}}</span>
-      <span class="block positive" :calss="{'active' :selectType===1}">{{desc.positive}}</span>
-      <span class="block negative" :class="{'active' :selectType===2}">{{desc.negative}}</span>
+      <span @click="select(0, $event)" class="block positive" :class="{'active': selectType===0}">{{desc.all}}</span>
+      <span @click="select(1, $event)" class="block positive" :class="{'active': selectType===1}">{{desc.positive}}</span>
+      <span @click="select(2, $event)" class="block negative" :class="{'active': selectType===2}">{{desc.negative}}</span>
     </div>
     <div class="switch" :class="{'on': onlyContent}" @click="toggle">
         <span class="icon-check_circle"></span>
@@ -34,11 +34,17 @@
       }
     },
     methods: {
-      select (type) {
-        this.selectType = type
+      select (type, event) {
+        if (!event._constructed) {
+          return
+        }
+        this.$emit('selectType', type)
       },
-      toggle () {
-        this.onlyContent = !this.onlyContent
+      toggle (event) {
+        if (!event._constructed) {
+          return
+        }
+        this.$emit('toggleContent', this.onlyContent)
       }
     }
   }
