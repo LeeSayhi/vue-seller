@@ -1,9 +1,9 @@
 <template>
   <div class="ratingSelect">
     <div class="rating-type border-1px">
-      <span @click="select(0, $event)" class="block positive" :class="{'active': selectType===0}">{{desc.all}}</span>
-      <span @click="select(1, $event)" class="block positive" :class="{'active': selectType===1}">{{desc.positive}}</span>
-      <span @click="select(2, $event)" class="block negative" :class="{'active': selectType===2}">{{desc.negative}}</span>
+      <span @click="select(2, $event)" class="block positive" :class="{'active': selectType===2}">{{desc.all}}<span class="count">{{ratings.length}}</span></span>
+      <span @click="select(0, $event)" class="block positive" :class="{'active': selectType===0}">{{desc.positive}}<span class="count">{{positive.length}}</span></span>
+      <span @click="select(1, $event)" class="block negative" :class="{'active': selectType===1}">{{desc.negative}}<span class="count">{{negative.length}}</span></span>
     </div>
     <div class="switch" :class="{'on': onlyContent}" @click="toggle">
         <span class="icon-check_circle"></span>
@@ -12,9 +12,9 @@
   </div>
 </template>
 <script>
-  const ALL = 0
-  // const positive = 1
-  // const negative = 2
+  const ALL = 2
+  const POSITIVE = 0
+  const NEGATIVE = 1
 
   export default {
     props: {
@@ -31,6 +31,12 @@
       onlyContent: {
         type: Boolean,
         default: false
+      },
+      ratings: {
+        type: Array,
+        default () {
+          return []
+        }
       }
     },
     methods: {
@@ -45,6 +51,18 @@
           return
         }
         this.$emit('toggleContent', this.onlyContent)
+      }
+    },
+    computed: {
+      positive () {
+        return this.ratings.filter((rating) => {
+          return rating.rateType === POSITIVE
+        })
+      },
+      negative () {
+        return this.ratings.filter((rating) => {
+          return rating.rateType === NEGATIVE
+        })
       }
     }
   }
@@ -66,6 +84,9 @@
         border-radius: 1px
         font-size: 12px
         color: rgb(77, 85, 93)
+        .count
+          margin-left: 2px
+          font-size: 8px         
       .active
         color: #fff
       .positive

@@ -33,7 +33,7 @@
           <v-ratingSelect :desc="desc" :select-type="selectType" :ratings="food.ratings" :only-content="onlyContent" @toggleContent="toggle" @selectType="type"></v-ratingSelect>
           <div class="rating-wrapper">
             <ul v-show="food.ratings && food.ratings.length">
-              <li  class="rating-item border-1px" v-for="rating in food.ratings" v-show="needShow(rating.text)">
+              <li  class="rating-item border-1px" v-for="rating in food.ratings" v-show="needShow(rating.rateType, rating.text)">
                 <div class="time">{{rating.rateTime | formatDate}}</div>
                 <p class="text"><span :class="{'icon-thumb_up': rating.rateType === 0, 'icon-thumb_down': rating.rateType === 1}"></span>{{rating.text}}</p>
                 <div class="user">
@@ -58,10 +58,8 @@
 
   import BScroll from 'better-scroll'
 
-  const ALL = 0
-  const positive = 1
-  const negative = 2
-
+  const ALL = 2
+  
   export default {
     props: {
       food: {
@@ -83,11 +81,15 @@
     methods: {
       show () {
         this.showFlag = true
-        this.$nextTick(() => {
-          this.scroll = new BScroll(this.$refs.food, {
-            click: true
+        if (!this.scroll) {
+          this.$nextTick(() => {
+            this.scroll = new BScroll(this.$refs.food, {
+              click: true
+            })
           })
-        })
+        } else {
+          this.scroll.refresh()
+        }
       },
       hide () {
         this.showFlag = false
@@ -95,19 +97,25 @@
       // 子组件触发的事件
       toggle (boolean) {   // 只看
         this.onlyContent = !boolean
+        this.$nextTick(() => {
+          this.scroll.refresh()
+        })
       },
       type (type) {      // 评价内容切换
-        if (type === 0) {
-          this.selectType = ALL
-        } else if (type === 1) {
-          this.selectType = positive
-        } else {
-          this.selectType = negative
-        }
+        this.selectType = type
+        this.$nextTick(() => {
+          this.scroll.refresh()
+        })
       },
-      needShow (text) {
+      // 联动只看内容和切换评价类型
+      needShow (type, text) {
         if (this.onlyContent && !text) {
           return false
+        }
+        if (this.selectType === ALL) {
+          return true
+        } else {
+          return type === this.selectType
         }
       }
     },
