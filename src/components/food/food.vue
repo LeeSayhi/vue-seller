@@ -18,9 +18,11 @@
             <span class="now">&yen;{{food.price}}</span><span class="old" v-show="food.oldPrice">&yen;{{food.oldPrice}}</span>
           </div>
           <div class="cartcontrol-wrapper">
-            <v-cartcontrol :food="food"></v-cartcontrol>
+            <v-cartcontrol :food="food" @cartDrop="_drop"></v-cartcontrol>
           </div>
-          <div class="buy">加入购物车</div>
+          <transition name="fade">
+            <div class="buy" @click.stop.prevent="addFirst($event)" v-show="!food.count || food.count === 0">加入购物车</div>
+          </transition>
         </div>
         <v-split v-show="food.info"></v-split>
         <div class="info" v-show="food.info">
@@ -58,6 +60,8 @@
 
   import BScroll from 'better-scroll'
 
+  import Vue from 'vue'
+
   const ALL = 2
   
   export default {
@@ -81,15 +85,15 @@
     methods: {
       show () {
         this.showFlag = true
-        if (!this.scroll) {
-          this.$nextTick(() => {
+        this.$nextTick(() => {
+          if (!this.scroll) {
             this.scroll = new BScroll(this.$refs.food, {
               click: true
             })
-          })
-        } else {
-          this.scroll.refresh()
-        }
+          } else {
+            this.scroll.refresh()
+          }
+        })
       },
       hide () {
         this.showFlag = false
@@ -117,6 +121,18 @@
         } else {
           return type === this.selectType
         }
+      },
+      // 第一次点击 事件派发父组件(goods)
+      addFirst (event) {
+        if (!event._constructed) {
+          return
+        }
+        this.$emit('cartAdd', event.target)
+        Vue.set(this.food, 'count', 1)
+      },
+      // 再次点击 先监听子组件(cartcontrol)派发的事件，再将参数传递父组件(goods)
+      _drop (event) {
+        this.$emit('cartAdd', event)
       }
     },
     components: {
@@ -215,7 +231,12 @@
           border-radius: 12px
           font-size: 10px
           color: #fff
-          background: rgb(0, 160, 220)     
+          background: rgb(0, 160, 220)
+          transition: all 0.4s
+          &.fade-enter-active, &.fade-leave-active
+           transform: translate3d(0, 0, 0)
+          &.fade-enter, &.fade-leave-active
+           transform: translate3d(100%, 0, 0)
     .info
       padding: 18px
       .title

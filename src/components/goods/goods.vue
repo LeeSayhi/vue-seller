@@ -39,7 +39,7 @@
       </div>
       <v-shopCart ref="shopCart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopCart>
     </div>
-    <v-food :food="selectFood" ref="food"></v-food>
+    <v-food :food="selectFood" ref="food" @cartAdd="_drop"></v-food>
   </div>
 </template>
 
