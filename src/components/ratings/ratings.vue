@@ -1,5 +1,5 @@
 <template>	
-	<div class="ratings">
+	<div class="ratings" ref="ratings">
 		<div class="rating-contente">
     <div class="overview">
       <div class="overview-left">
@@ -26,7 +26,28 @@
     </div>
     <v-split></v-split>
     <v-ratingSelect :desc="desc" :select-type="selectType" @selectType="ratingType"></v-ratingSelect>
-    <div class="ratingWrapper"></div>   
+    <div class="ratingWrapper">
+      <ul>
+        <li class="rating-lsit border-1px" v-for="rating in ratings">
+          <div class="avatar">
+            <img :src="rating.avatar" width="28" height="28">
+          </div>
+          <div class="content">
+            <h2 class="name">{{rating.username}}</h2>
+            <div class="star-wrapper">
+              <v-star :score="4" :size="24"></v-star>
+              <span class="delivery" v-show="rating.delivery">{{rating.deliveryTime}}分钟送达</span>
+            </div>
+            <p class="text">{{rating.text}}</p>
+            <div class="recommend">
+              <span class="icon-thumb_up"></span>
+              <span v-for="item in rating.recommend" class="item">{{item}}</span>
+            </div>
+            <div class="time">2017-10-30 23:26</div>
+          </div>
+        </li>
+      </ul>
+    </div>   
     </div>
 	</div>
 </template>
@@ -34,6 +55,8 @@
   import star from '../star/star.vue'
   import split from '../split/split.vue'
   import ratingSelect from '../ratingSelect/ratingSelect.vue'
+
+  import BScroll from 'better-scroll'
 
   const ALL = 2
 
@@ -45,6 +68,7 @@
     },
     data () {
       return {
+        ratings: [],
         desc: {
           all: '全部',
           positive: '满意',
@@ -52,6 +76,18 @@
         },
         selectType: ALL
       }
+    },
+    created () {
+      this.$http.get('api/ratings').then((response) => {
+        if (response.data.errno === 0) {
+          this.ratings = response.data.data
+          this.$nextTick(() => {
+            this.scroll = new BScroll(this.$refs.ratings, {
+              click: true
+            })
+          })
+        }
+      })
     },
     methods: {
       ratingType (type) {
@@ -66,6 +102,8 @@
   }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
+  @import "../../common/stylus/mixin.styl"
+  
   .ratings
     position: absolute
     top: 174px
@@ -131,5 +169,64 @@
             margin-left: 12px
             font-size: 12px
             color: rgb(147, 153, 159)
-        
+    .ratingWrapper
+      padding: 0 18px
+      .rating-lsit
+        display: flex
+        padding: 18px 0
+        border-1px(rgba(7, 17, 27, 0.1))
+        font-size: 0
+        .avatar
+          flex: 0 0 28px
+          margin-right: 12px
+          width: 28px
+          img
+            border-radius: 50%
+        .content
+          flex: 1
+          .name
+            line-height: 12px
+            margin-bottom: 4px
+            font-size: 10px
+            color: rgb(7, 17, 27)
+          .star-wrapper
+            margin-bottom: 6px
+            font-size: 0
+            .star
+              display: inline-block
+              vertical-align: top
+              margin-right: 6px
+            .delivery
+              display: inline-block
+              vertical-align: top
+              line-height: 12px
+              font-size: 10px
+              font-weight: 200
+              color: rgb(147, 153, 159)
+          .text
+            line-height: 18px
+            margin-bottom: 8px
+            font-size: 12px
+            color: rgb(7, 17, 27)
+          .recommend
+            font-size: 0
+            .icon-thumb_up
+              display: inline-block
+              line-height: 16px
+              margin: 0 8px 4px 0
+              font-size: 12px
+              color: rgb(0, 160, 220)
+            .item
+              display: inline-block
+              padding: 4px 6px
+              margin-right: 8px
+              border: 1px solid rgba(7, 17, 27, 0.1)
+              background: rgb(277, 255, 255)
+              border-radius: 2px
+              font-size: 9px
+              color: rgb(147, 153, 159)
+              &:last-child
+                margin: 0
+            
+          
 </style>
