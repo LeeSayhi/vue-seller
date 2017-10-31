@@ -28,9 +28,9 @@
             </div>
           </li>
         </ul>
-        <div class="favorite">
-          <span class="icon-favorite"></span>
-          <span class="text">收藏</span>
+        <div class="favorite" @click="toggleFavorite">
+          <span class="icon-favorite" :class="{'active': favorite}"></span>
+          <span class="text">{{favoriteText}}</span>
         </div>
       </div>
       <v-split></v-split>
@@ -75,10 +75,19 @@
 
   import BScroll from 'better-scroll'
 
+  import {saveToLocal, loadFromLocal} from '../../common/js/store.js'
+
   export default {
     props: {
       seller: {
         type: Object
+      }
+    },
+    data () {
+      return {
+        favorite: (() => {
+          return loadFromLocal(this.seller.id, 'favorite', false)
+        })()
       }
     },
     components: {
@@ -87,6 +96,11 @@
     },
     created () {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee']
+    },
+    computed: {
+      favoriteText () {
+        return this.favorite ? '已收藏' : '收藏'
+      }
     },
     // DOM已经初始化完成，此刻数据还没获取到（数据是异步获取）
     mounted () {
@@ -128,6 +142,13 @@
             }
           })
         }
+      },
+      toggleFavorite (event) {
+        if (!event._constructed) {
+          return
+        }
+        this.favorite = !this.favorite
+        saveToLocal(this.seller.id, 'favorite', this.favorite)
       }
     }
   }
@@ -196,6 +217,8 @@
           line-height: 24px
           font-size: 24px
           color: #d4d6d9
+          &.active
+            color: rgb(240, 20, 20)
         .text
           line-height: 10px
           font-size: 10px

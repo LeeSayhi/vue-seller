@@ -3,47 +3,47 @@
 		<div class="rating-contente">
     <div class="overview">
       <div class="overview-left">
-        <h1 class="score">3.9</h1>
+        <h1 class="score">{{seller.score}}</h1>
         <div class="title">综合评分</div>
-        <div class="rank">高于周边商家62.8%</div>
+        <div class="rank">高于周边商家{{seller.rankRate}}%</div>
       </div>
       <div class="overview-right">
         <div class="score-wrapper">
           <span class="title">服务态度</span>
-          <v-star :size="36" :score="3.9"></v-star>
-          <span class="score">3.9</span>
+          <v-star :size="36" :score="seller.serviceScore"></v-star>
+          <span class="score">{{seller.serviceScore}}</span>
         </div>
         <div class="score-wrapper">
           <span class="title">商品评分</span>
-          <v-star :size="36" :score="4"></v-star>
-          <span class="score">4.0</span>
+          <v-star :size="36" :score="seller.foodScore"></v-star>
+          <span class="score">{{seller.foodScore}}</span>
         </div>
         <div class="delivery-wrapper">
           <span class="title">送达时间</span>
-          <span class="delivery">10分钟</span>
+          <span class="delivery">{{seller.deliveryTime}}分钟</span>
         </div>
       </div>
     </div>
     <v-split></v-split>
-    <v-ratingSelect :desc="desc" :select-type="selectType" @selectType="ratingType"></v-ratingSelect>
+    <v-ratingSelect :ratings="ratings" :desc="desc" :select-type="selectType" :only-content="onlyContent" @selectType="type" @toggleContent="toggle"></v-ratingSelect>
     <div class="ratingWrapper">
       <ul>
-        <li class="rating-lsit border-1px" v-for="rating in ratings">
+        <li class="rating-lsit border-1px" v-for="rating in ratings" v-show="needShow(rating.rateType, rating.text)">
           <div class="avatar">
             <img :src="rating.avatar" width="28" height="28">
           </div>
           <div class="content">
             <h2 class="name">{{rating.username}}</h2>
             <div class="star-wrapper">
-              <v-star :score="4" :size="24"></v-star>
+              <v-star :score="rating.score" :size="24"></v-star>
               <span class="delivery" v-show="rating.delivery">{{rating.deliveryTime}}分钟送达</span>
             </div>
             <p class="text">{{rating.text}}</p>
             <div class="recommend">
-              <span class="icon-thumb_up"></span>
+              <span :class="{'icon-thumb_up': rating.rateType===0, 'icon-thumb_down': rating.rateType===1}"></span>
               <span v-for="item in rating.recommend" class="item">{{item}}</span>
             </div>
-            <div class="time">2017-10-30 23:26</div>
+            <div class="time">{{rating.rateTime | formatDate}}</div>
           </div>
         </li>
       </ul>
@@ -57,6 +57,8 @@
   import ratingSelect from '../ratingSelect/ratingSelect.vue'
 
   import BScroll from 'better-scroll'
+
+  import {formatDate} from '../../common/js/date.js'
 
   const ALL = 2
 
@@ -74,7 +76,8 @@
           positive: '满意',
           negative: '不满意'
         },
-        selectType: ALL
+        selectType: ALL,
+        onlyContent: true
       }
     },
     created () {
@@ -90,14 +93,39 @@
       })
     },
     methods: {
-      ratingType (type) {
+      type (type) {
         this.selectType = type
+        this.$nextTick(() => {
+          this.scroll.refresh()
+        })
+      },
+      toggle (onlyContent) {
+        this.onlyContent = !onlyContent
+        this.$nextTick(() => {
+          this.scroll.refresh()
+        })
+      },
+      needShow (type, text) {
+        if (this.onlyContent && !text) {
+          return false
+        }
+        if (this.selectType === ALL) {
+          return true
+        } else {
+          return type === this.selectType
+        }
       }
     },
     components: {
       'v-star': star,
       'v-split': split,
       'v-ratingSelect': ratingSelect
+    },
+    filters: {
+      formatDate (time) {
+        let date = new Date(time)
+        return formatDate(date, 'yyyy-MM-dd hh:mm')
+      }
     }
   }
 </script>
@@ -176,6 +204,8 @@
         padding: 18px 0
         border-1px(rgba(7, 17, 27, 0.1))
         font-size: 0
+        &:last-child
+          border-none()
         .avatar
           flex: 0 0 28px
           margin-right: 12px
@@ -183,6 +213,7 @@
           img
             border-radius: 50%
         .content
+          position: relative
           flex: 1
           .name
             line-height: 12px
@@ -210,12 +241,17 @@
             color: rgb(7, 17, 27)
           .recommend
             font-size: 0
+            line-height: 16px
             .icon-thumb_up
               display: inline-block
-              line-height: 16px
               margin: 0 8px 4px 0
-              font-size: 12px
+              font-size: 9px
               color: rgb(0, 160, 220)
+            .icon-thumb_down
+              display: inline-block
+              margin: 0 8px 4px 0
+              font-size: 9px
+              color: #93999f             
             .item
               display: inline-block
               padding: 4px 6px
@@ -224,9 +260,12 @@
               background: rgb(277, 255, 255)
               border-radius: 2px
               font-size: 9px
-              color: rgb(147, 153, 159)
-              &:last-child
-                margin: 0
-            
-          
+              color: rgb(147, 153, 159)         
+          .time
+            position: absolute
+            top: 0
+            right: 0
+            line-height: 12px
+            font-size: 10px
+            color: rgb(147, 153, 159)
 </style>
